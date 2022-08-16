@@ -5,6 +5,7 @@ const prism = require('prism-media');
 const config = require('./config.json');
 const ytdl = require('ytdl-core');
 const express = require('express');
+const play = require('play-dl');
 const port = 3000;
 const app = express();
 app.get('/', function (req, res) {
@@ -23,34 +24,50 @@ const {
 } = require('@discordjs/voice');
 
 const playlist = [
-    'https://www.youtube.com/watch?v=t1ik7LTG5TI&list=PLhL1LHsxYkZWsFa0iY1Qo94BIxot5z2-K&index=1&t=2s',
-    'https://www.youtube.com/watch?v=znSEP-SXzjM&list=PLhL1LHsxYkZWsFa0iY1Qo94BIxot5z2-K&index=2&t=213s',
-    'https://www.youtube.com/watch?v=2Ng5o-8YleM&list=PLhL1LHsxYkZWsFa0iY1Qo94BIxot5z2-K&index=3&t=2471s'
+    'https://www.youtube.com/watch?v=DWYwmTdXpqw',
+    'https://www.youtube.com/watch?v=UqKVL56IJB8',
+	'https://www.youtube.com/watch?v=g20t_K9dlhU',
+	'https://www.youtube.com/watch?v=pSFXJ7teisw',
+	'https://www.youtube.com/watch?v=2YllmPaKhkY'
 ];
-var position = 0;
 
-const player = createAudioPlayer();
-function playSong(url) {
-	const resource = createAudioResource(
-        ytdl(url),
-      );
-    
-    player.play(resource);
-    entersState(player, AudioPlayerStatus.Playing, 5e3);
+function nextSong (){
+	var time = new Date().getHours();
+	if (time > 0 && time < 6){
+
+	}
+	else if (time >= 6 && time < 9){
+
+	}
+	else if (time >= 9 && time < 12){
+
+	}
+	else if (time >= 12 && time < 15){
+
+	}
+	else if (time >= 15 && time < 18){
+
+	}
+	else if (time >= 18){
+
+	}
 }
 
-
-player.on('stateChange', (oldState, newState) => {
-	if (oldState.status === AudioPlayerStatus.Idle && newState.status === AudioPlayerStatus.Playing) {
-		console.log('Playing audio output on audio player');
-	} else if (newState.status === AudioPlayerStatus.Idle) {
-		// console.log('Playback has stopped. Attempting to restart.');
-		// attachRecorder();
-        position++;
-        if (position == playlist.length) position = 0;
-        playSong(playlist[position]);
-	}
-});
+async function getResouce(link){
+	
+	// const r = await createAudioResource(ytdl(
+	// 	link,
+	// 	{
+	// 		o: '-',
+	// 		q: '',
+	// 		f: 'bestaudio[ext=webm+acodec=opus+asr=48000]/bestaudio',
+	// 		r: '100K',
+	// 	},
+	// 	{ stdio: ['ignore', 'pipe', 'ignore'] },
+	// ));
+	const r = createAudioResource(await ytdl(link, {filter: "audioonly"}))
+	return r;
+}
 
 async function connectToChannel(channel) {
 	const connection = joinVoiceChannel({
@@ -70,8 +87,7 @@ async function connectToChannel(channel) {
 const client = new Client({ intents: ['GUILDS', 'GUILD_MESSAGES', 'GUILD_VOICE_STATES'] });
 
 client.on('ready', async () => {
-	console.log('discord.js client is ready!');
-	playSong(playlist[position]);
+	console.log('Qoobee music is ready!');
 });
 
 client.on('messageCreate', async (message) => {
@@ -81,6 +97,60 @@ client.on('messageCreate', async (message) => {
 		if (channel) {
 			try {
 				const connection = await connectToChannel(channel);
+				const player = createAudioPlayer({
+					behaviors: {
+						noSubscriber: NoSubscriberBehavior.Play
+					}
+				});
+				var position = Math.floor(Math.random() * playlist.length);
+
+				getResouce(playlist[position]).then(
+					function(value){
+						player.play(value);
+					},
+					function(err){
+
+					}
+				);
+
+				// const resource = createAudioResource(
+				// 	ytdl(playlist[position], {filter: "audioonly"}),
+				// );
+				
+				// player.play(resource);
+				entersState(player, AudioPlayerStatus.Playing, 5e3);
+
+				// player event
+				
+				player.on('stateChange', (oldState, newState) => {
+					try {
+						if (oldState.status === AudioPlayerStatus.Idle && newState.status === AudioPlayerStatus.Playing) {
+							console.log('Playing audio output on audio player');
+						} else if (newState.status === AudioPlayerStatus.Idle) {
+							position++;
+							if (position == playlist.length) position = 0;
+
+
+							const newResource = createAudioResource(
+								ytdl(playlist[position], {filter: "audioonly"}),
+							);
+							getResouce(playlist[position]).then(
+								function(value){
+									player.play(value);
+								},
+								function(err){
+
+								}
+							);
+							// player.play(newResource);
+						}
+					} catch(error){
+						console.log(error);
+						
+					}
+					
+				});
+
 				connection.subscribe(player);
                 
 				await message.reply('Playing now!');
@@ -90,6 +160,9 @@ client.on('messageCreate', async (message) => {
 		} else {
 			await message.reply('Join a voice channel then try again!');
 		}
+	}
+	if (message.content === '-next') {
+
 	}
 });
 

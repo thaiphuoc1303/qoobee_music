@@ -1,6 +1,9 @@
 {
-	"token": "MTAwMjk3Mjk5MTY5MDM4MzQwMA.Gw-eVz.3ki_McUszcymkf2RVjdfIpKAeqyha303kRB6TI",
+	"token": "MTAwMjk3Mjk5MTY5MDM4MzQwMA.GFGfH1.qE_osV6P8syUr9L5b4EZygEgGTxQtPbTKDD448",
 	"device": "Stereo Mix (Realtek(R) Audio)",
 	"type": "dshow",
-	"maxTransmissionGap": 5000
+	"maxTransmissionGap": 5000,
+	"user" : "0704517a71900b3b0d1582692c0d6fb0",
+	"mongoPassword" : "phuoc1303",
+	"hostString" : "11a.mongo.evennode.com:27018,11b.mongo.evennode.com:27018"
 }
