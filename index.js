@@ -5,7 +5,7 @@ const prism = require('prism-media');
 const config = require('./config.json');
 const ytdl = require('ytdl-core');
 const express = require('express');
-const port = 80;
+const port = 3000;
 const app = express();
 app.get('/', function (req, res) {
 	res.send('Hello World');
