@@ -10,9 +10,7 @@ const app = express();
 app.get('/', function (req, res) {
 	res.send('Hello World');
  });
- app.listen(port, () => {
-    console.log(`Example app listening on port http://localhost:${port}`)
-  });
+ app.listen(process.env.PORT, '0.0.0.0');
 // const {
 // 	NoSubscriberBehavior,
 // 	StreamType,
