@@ -1,6 +1,6 @@
 require('module-alias/register');
 
-const { Client } = require('discord.js');
+const { Client, Guild } = require('discord.js');
 const prism = require('prism-media');
 const config = require('./config.json');
 const ytdl = require('ytdl-core');
@@ -28,45 +28,86 @@ const playlist = [
     'https://www.youtube.com/watch?v=UqKVL56IJB8',
 	'https://www.youtube.com/watch?v=g20t_K9dlhU',
 	'https://www.youtube.com/watch?v=pSFXJ7teisw',
-	'https://www.youtube.com/watch?v=2YllmPaKhkY'
+	'https://www.youtube.com/watch?v=2YllmPaKhkY',
+	
+	'https://www.youtube.com/watch?v=xIEhVH7wQw4',
+	'https://www.youtube.com/watch?v=yNQ6FtRnLPc',
+	'https://www.youtube.com/watch?v=9V3IgiERE9I',
+	'https://www.youtube.com/watch?v=jETECLiAF3o',
+	'https://www.youtube.com/watch?v=V3MA_YojrYM',
+	'https://www.youtube.com/watch?v=ZEHGLxNKpk0',
+	'https://www.youtube.com/watch?v=l1nlJnIze8M',
+	'https://www.youtube.com/watch?v=L07GgpoT0GE',
+	'https://www.youtube.com/watch?v=ritnXLZHgmc',
+	'https://www.youtube.com/watch?v=Ov28PsV-4Dw',
+	'https://www.youtube.com/watch?v=0tX_UnzmOtg'
 ];
 
-function nextSong (){
+function setStatusClient (){
 	var time = new Date().getHours();
 	if (time > 0 && time < 6){
-
+		client.user.setPresence({ activities: [{ 
+			name: 'lofi music',
+			type :'LISTENING'
+		}], status: 'online' });
 	}
 	else if (time >= 6 && time < 9){
-
+		client.user.setPresence({ activities: [{ 
+			name: 'EDM',
+			type :'LISTENING'
+		}], status: 'online' });
 	}
 	else if (time >= 9 && time < 12){
-
+		client.user.setPresence({ activities: [{ 
+			name: 'US/UK',
+			type :'LISTENING'
+		}], status: 'online' });
 	}
 	else if (time >= 12 && time < 15){
-
+		client.user.setPresence({ activities: [{ 
+			name: 'Kpop',
+			type :'LISTENING'
+		}], status: 'online' });
 	}
 	else if (time >= 15 && time < 18){
-
+		client.user.setPresence({ activities: [{ 
+			name: 'balad',
+			type :'LISTENING'
+		}], status: 'online' });
 	}
 	else if (time >= 18){
-
+		client.user.setPresence({ activities: [{ 
+			name: 'EDM',
+			type :'LISTENING'
+		}], status: 'online' });
 	}
 }
 
 async function getResouce(link){
+	try{
+		// const r = await createAudioResource(ytdl(
+		// 	link,
+		// 	{
+		// 		o: '-',
+		// 		q: '',
+		// 		f: 'bestaudio[ext=webm+acodec=opus+asr=48000]/bestaudio',
+		// 		r: '100K',
+		// 	},
+		// 	{ stdio: ['ignore', 'pipe', 'ignore'] }, 
+		// 	{filter: "audioonly"}
+		// ));
+
+		// const r = createAudioResource(await ytdl(link, {filter: "audioonly"}))
+
+        const stream = await play.stream(link);
+        const r = createAudioResource(stream.stream, {
+            inputType: stream.type
+        });
+		return r;
+	} catch(error){
+
+	}
 	
-	// const r = await createAudioResource(ytdl(
-	// 	link,
-	// 	{
-	// 		o: '-',
-	// 		q: '',
-	// 		f: 'bestaudio[ext=webm+acodec=opus+asr=48000]/bestaudio',
-	// 		r: '100K',
-	// 	},
-	// 	{ stdio: ['ignore', 'pipe', 'ignore'] },
-	// ));
-	const r = createAudioResource(await ytdl(link, {filter: "audioonly"}))
-	return r;
 }
 
 async function connectToChannel(channel) {
@@ -88,6 +129,14 @@ const client = new Client({ intents: ['GUILDS', 'GUILD_MESSAGES', 'GUILD_VOICE_S
 
 client.on('ready', async () => {
 	console.log('Qoobee music is ready!');
+	// develop
+	client.user.setPresence({ activities: [{ 
+		name: '🧑‍💻Visual Studio Code with Qoobee',
+		type :'PLAYING'
+	}], status: 'online' });
+
+	//deploy
+	// setStatusClient();
 });
 
 client.on('messageCreate', async (message) => {
@@ -102,25 +151,23 @@ client.on('messageCreate', async (message) => {
 						noSubscriber: NoSubscriberBehavior.Play
 					}
 				});
-				var position = Math.floor(Math.random() * playlist.length);
+				var position =0;
 
 				getResouce(playlist[position]).then(
 					function(value){
 						player.play(value);
+						entersState(player, AudioPlayerStatus.Playing, 5e3);
 					},
 					function(err){
 
 					}
 				);
-
-				// const resource = createAudioResource(
-				// 	ytdl(playlist[position], {filter: "audioonly"}),
-				// );
 				
-				// player.play(resource);
-				entersState(player, AudioPlayerStatus.Playing, 5e3);
-
 				// player event
+
+				player.on('error', ()=>{
+					
+				});
 				
 				player.on('stateChange', (oldState, newState) => {
 					try {
@@ -130,13 +177,10 @@ client.on('messageCreate', async (message) => {
 							position++;
 							if (position == playlist.length) position = 0;
 
-
-							const newResource = createAudioResource(
-								ytdl(playlist[position], {filter: "audioonly"}),
-							);
 							getResouce(playlist[position]).then(
 								function(value){
 									player.play(value);
+																		
 								},
 								function(err){
 
@@ -161,9 +205,14 @@ client.on('messageCreate', async (message) => {
 			await message.reply('Join a voice channel then try again!');
 		}
 	}
-	if (message.content === '-next') {
+	else if (message.content === '-next') {
 
+	}
+	else {
+		if (message.author.id != Guild.ownerId) {
+
+		}
 	}
 });
 
-void client.login(config.token);
+void client.login(config.token_developing);

@@ -2,6 +2,9 @@
 	"name": "discord-radio-bot",
 	"version": "1.0.0",
 	"description": "A proof-of-concept radio bot for @discordjs/voice",
+	"engines": {
+		"node": "18.x"
+	  },
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1",
 		"start": "node index.js"
